@@ -138,7 +138,7 @@
 
   <section id="config" hidden>
     <h2 class="cfg-title">Configuración de la sección privada</h2>
-    <p class="note">Solo para quien administra la página. Todo se calcula en tu dispositivo y no se envía a ningún sitio.</p>
+    <p class="note">Solo para quien administra la página. Todo se calcula en tu dispositivo y no se envía a ningún sitio. Para añadir un acceso nuevo basta con cifrar solo la línea nueva, con la misma clave del equipo.</p>
     <input type="password" id="cfg-key" placeholder="Clave del equipo (mínimo 10 caracteres)" autocomplete="off">
     <textarea id="cfg-lines" rows="8" placeholder="Una línea por enlace: icono | título | descripción | enlace"></textarea>
     <button type="button" class="btn" id="cfg-go">Generar código</button>
@@ -155,7 +155,7 @@
    CONFIGURACIÓN
    ===================================================================== */
 const APP_NAME = 'Sacaba Summer Games 2027';
-const CONTACT_EMAIL = 'info@sacabasummergames.com';
+const CONTACT_EMAIL = 'sacabasummergames@gmail.com';
 
 const LINKS = {
   inscripcion: 'https://arena.wodbuster.com/register.aspx?id=4583',
@@ -167,6 +167,9 @@ const LINKS = {
 /* Contenido de la sección Organización, cifrado con la clave del equipo.
    Se genera con la herramienta de configuración y se pega aquí. */
 const ORG_BLOB = 'Gl1njYKO3jUNwA+7spnXkRj8fiGzVsVIGTVqM2fwufvyKifRldRa9H5KPS8L2HbjNu3PoiLiD9UFqd27S8Yi5G6I8ZFpoOs7pR0Ou9xaSIO5A8fsIObK5vwYSCD4KHIbFthBEmk9bOGsFxuAqCf7cGZLQ6IywNeOYhIj57ektUqp9N++IQYAhCzUOzWXj5Jo2v0Qcx0oWiXARjOEYTqaQPFnaXv3t/3ohnr7uhyqnzU0gS5VsrN1pGSSJIsRTv+EaJ4/Uzh0iJJ96jssQolrCNsM5ob2bo7bZroeWryTMKDJv/coUSu7iclgJsRb1RKcpxqxJS4/TmjWZnmCk4YjISCYFmrCBqOneYhEMg+HdK1SuOgb/VzM3k0DDMrAaHzwXQdzv+Z/YalmPAt1z/zFiQZsAOwSGGYQthDKbeuvouVZOukwh1Lyi6g0olfJKe8f7UDGYemBY4w9ZAHKUOx3vX/C8Po/MauTBHFMrnlkTvx8AtH+nuSjZUfuF+V05o3nzNCGJl/ZlOlCr7M8jfnDjoek0Z1bTNWcT571naclskwROvSPROsxWrEVBh3jdFfmsWBAG1/HoKngkW0GobZ1lhtizkdzZEDTjZKbx5sEytvz1gE7Zv34jtMVI9KtjeKhAyDWznZvEtrB/y6p1GbzL4CCrsBDtSLMsSlRpleST0PJ00HrDVKCq04JMqd+B5hRPNVUfQ5FZW00t40QuSkDftaa9IkQvGcJNUgA9m1aC4nKhoEgCwyfLsjLJF+A9gmhbLAT4UTFzxersPjx3X4rnQRI9MJg9UTaBw79342ShOc8B90jrSmFx++aq3xOOpSI86XoVRqvUM2C2FJQ12EYFNep/XdQAyTJrqOPTPeERmCgGNngObOxvMSL4MwO5Gq50XFzXZ0VrfTDPzlbaUtJ5ooaZTFXiJgljaPtokDefdpiqg/IQgjXN3YpU+2s84qPpMzTJNjLF5cjEaWOMsUejablsyWOt8gykQvpYhDEm5pwYpY0KxmfNhfrW2CsMf4WeLdsZfsKQ2u1OA3FPey1PRUXMYXcqG9vJaZzoWeLqbzTdKpU7bfUmEdnMeJ/Cskt/wmom3j5VSrQsI1fPVTyZEpf9xUK+r3xofngybJL5V3DEjD6lXSddbKNTLYWLPgaRC2pdUEctpz6nIZnZgKJJ5XzH6lJvl5e5BERME3VsT2JQpkswyo1flu1UDZ15YdxAlETzlMUveSlzbO7BaVky9EXy0ktobvrh1qP8xbgP08wOsyITBiVkTmkzgCAlw+8chTpFV2OZyO3cMBPcyzhsSUJjuEAy7b2QroHZ65BIt2fsiJdFB06Bi9rHupIslpvBbWNdmb+0QxNgQw/VN1fv5bz';
+/* Códigos adicionales (opcional): permiten añadir accesos nuevos sin rehacer el código principal.
+   Se cifran con la MISMA clave y se suman a los anteriores. */
+const ORG_EXTRA = ['ygcQn3PWmGpKfJUskGyiMsuly2Q5sF7Es5xq3U0qj0eHfeqBiqfEX/f2T9ev+/5jaYkVK8iwEW3eqyxAf3cqphdcOrlNOA0hdJ5fPmkgEMJ/AGytxgQ1HBVEMZ2oJqobmpk1tImpWV8y+1mIpx8kZi0hUXU2g+ADZSm9ixIyp5n3aCjgK5tWRGVFUnOU/driSIO7ydOBh1XBYhbu1IFO2976kc4gWyO2gtMEcwewsvw95QO/zHtbSRTvHO5h83Ctq8hs6sNlTyJfOBLbWVyPt7WWbJ9bBfqg7Iuqk49ytfwa5VxFsJkKmqqu+Qk7zwi8YZ3wzmJENtx7vI1Xys6ZPAPVeNKDODWk3JXJL4a94wC7C2AQL3UKyN+yJj0W/vdBzQo='];
 
 const PARTICIPANTS = [
   { icon: '📝', title: 'Inscripción oficial', desc: 'Apúntate a la competición.', url: LINKS.inscripcion },
@@ -239,7 +242,10 @@ async function unlockOrg(pass, remember, silent) {
   try {
     if (!window.crypto || !crypto.subtle) throw new Error('nocrypto');
     if (!ORG_BLOB) throw new Error('noblob');
-    const items = await decryptJson(ORG_BLOB, pass.trim());
+    let items = await decryptJson(ORG_BLOB, pass.trim());
+    for (let i = 0; i < ORG_EXTRA.length; i++) {
+      items = items.concat(await decryptJson(ORG_EXTRA[i], pass.trim()));
+    }
     render(items, $('org-grid'));
     $('org-lock').hidden = true;
     $('org-content').hidden = false;
