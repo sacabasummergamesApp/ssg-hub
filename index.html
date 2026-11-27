@@ -138,7 +138,7 @@
 
   <section id="config" hidden>
     <h2 class="cfg-title">Configuración de la sección privada</h2>
-    <p class="note">Solo para quien administra la página. Todo se calcula en tu dispositivo y no se envía a ningún sitio. Para añadir un acceso nuevo basta con cifrar solo la línea nueva, con la misma clave del equipo.</p>
+    <p class="note">Solo para quien administra la página. Todo se calcula en tu dispositivo y no se envía a ningún sitio. Para añadir un acceso nuevo basta con cifrar solo la línea nueva, con la misma clave del equipo. Si hay líneas incompletas o enlaces no válidos, se indicará cuáles revisar y no se generará código parcial.</p>
     <input type="password" id="cfg-key" placeholder="Clave del equipo (mínimo 10 caracteres)" autocomplete="off">
     <textarea id="cfg-lines" rows="8" placeholder="Una línea por enlace: icono | título | descripción | enlace"></textarea>
     <button type="button" class="btn" id="cfg-go">Generar código</button>
@@ -236,7 +236,10 @@ async function decryptJson(blob, pass) {
 }
 
 /* ---------- Sección Organización ---------- */
+let unlockVersion = 0;
+
 async function unlockOrg(pass, remember, silent) {
+  const version = ++unlockVersion;
   const err = $('org-error');
   err.hidden = true;
   try {
@@ -246,12 +249,14 @@ async function unlockOrg(pass, remember, silent) {
     for (let i = 0; i < ORG_EXTRA.length; i++) {
       items = items.concat(await decryptJson(ORG_EXTRA[i], pass.trim()));
     }
+    if (version !== unlockVersion) return false;
     render(items, $('org-grid'));
     $('org-lock').hidden = true;
     $('org-content').hidden = false;
     if (remember) store(KEY_STORE, pass.trim());
     return true;
   } catch (e) {
+    if (version !== unlockVersion) return false;
     if (!silent) {
       err.textContent = e.message === 'nocrypto' ? 'Tu navegador no permite abrir esta sección. Prueba con Safari o Chrome actualizados.'
         : e.message === 'noblob' ? 'La sección de la organización todavía no está configurada.'
@@ -263,6 +268,7 @@ async function unlockOrg(pass, remember, silent) {
 }
 
 function lockOrg() {
+  unlockVersion++;
   $('org-grid').innerHTML = '';
   $('org-content').hidden = true;
   $('org-lock').hidden = false;
@@ -285,15 +291,28 @@ async function showTab(which) {
 /* ---------- Herramienta de configuración (#configurar) ---------- */
 async function generate() {
   const msg = $('cfg-msg');
+  $('cfg-out').value = '';
   const key = $('cfg-key').value.trim();
   if (key.length < 10) { msg.textContent = 'La clave debe tener al menos 10 caracteres.'; return; }
   const items = [];
-  $('cfg-lines').value.split('\n').forEach(function (line) {
+  const invalidLines = [];
+  $('cfg-lines').value.split('\n').forEach(function (line, index) {
     if (!line.trim()) return;
     const p = line.split('|').map(function (x) { return x.trim(); });
-    if (p.length < 4) return;
-    items.push({ icon: p[0], title: p[1], desc: p[2], url: p.slice(3).join('|') });
+    const url = p.slice(3).join('|');
+    let validUrl = false;
+    try { validUrl = ready(url) && Boolean(new URL(url).hostname); } catch (e) {}
+    if (p.length < 4 || p.slice(0, 3).some(function (value) { return !value; }) || !validUrl) {
+      invalidLines.push(index + 1);
+      return;
+    }
+    items.push({ icon: p[0], title: p[1], desc: p[2], url: url });
   });
+  if (invalidLines.length) {
+    msg.textContent = 'Revisa las líneas ' + invalidLines.join(', ') +
+      ': cada una necesita icono, título, descripción y un enlace http o https válido. No se ha generado código.';
+    return;
+  }
   if (!items.length) { msg.textContent = 'No encuentro ninguna línea válida (icono | título | descripción | enlace).'; return; }
   try {
     $('cfg-out').value = await encryptJson(items, key);
@@ -307,7 +326,15 @@ async function copyOut() {
   const t = $('cfg-out').value;
   if (!t) return;
   try { await navigator.clipboard.writeText(t); $('cfg-msg').textContent = 'Código copiado.'; }
-  catch (e) { $('cfg-out').select(); document.execCommand('copy'); $('cfg-msg').textContent = 'Código copiado.'; }
+  catch (e) {
+    $('cfg-out').select();
+    try {
+      if (!document.execCommand('copy')) throw new Error('copyfailed');
+      $('cfg-msg').textContent = 'Código copiado.';
+    } catch (copyError) {
+      $('cfg-msg').textContent = 'No se pudo copiar automáticamente. Selecciona el código y cópialo manualmente.';
+    }
+  }
 }
 
 function applyHash() { $('config').hidden = location.hash !== '#configurar'; }
